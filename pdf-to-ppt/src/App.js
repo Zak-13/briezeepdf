@@ -9,7 +9,7 @@ import { pink, teal, grey } from '@mui/material/colors';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 
 // Ensure the worker is being loaded correctly from the installed pdfjs-dist package
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
+GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
 
 function App() {
   const [file, setFile] = useState(null);
@@ -283,6 +283,7 @@ function App() {
         </Paper>
 
         {/* How to Convert Section */}
+        <Stack>
         <Box sx={{
           padding: 4,
           borderRadius: 2,
@@ -291,6 +292,7 @@ function App() {
           backgroundColor: '#505050', // Soft grayish background to match pastel goth
           border: `1px solid ${grey[700]}`,
         }}>
+          
           <Typography variant="h5" color={pink[300]} gutterBottom>
             How to Convert Files
           </Typography>
@@ -315,11 +317,17 @@ function App() {
             </Box>
           </Box>
         </Box>
-      </Stack>
-      
 
         {/* History Section */}
-        <Box sx={{ padding: 4, marginTop: 6, backgroundColor: '#2c2f38', borderRadius: 2 , flex: 1}}>
+        <Box sx={{ 
+          padding: 4, 
+          marginTop: 6, 
+          borderRadius: 2 , flex: 1, 
+          textAlign: 'center',
+          backgroundColor: '#505050', // Soft grayish background to match pastel goth
+          border: `1px solid ${grey[700]}`,
+          boxShadow: 3,
+          }}>
           <Typography variant="h5" color={pink[300]} gutterBottom>
             Conversion History
           </Typography>
@@ -356,6 +364,8 @@ function App() {
             )}
           </Box>
         </Box>
+        </Stack>
+      </Stack>  
     </Container>
   );
 }

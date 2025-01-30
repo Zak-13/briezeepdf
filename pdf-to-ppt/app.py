@@ -8,6 +8,7 @@ from pptx.util import Inches
 from PIL import Image
 import io
 import tempfile
+import atexit
 
 app = Flask(__name__)
 
@@ -61,6 +62,16 @@ def pdf_to_ppt(pdf_path, pptx_path):
     print(f"Conversion complete! PowerPoint saved as {pptx_file}")
     return pptx_file  # Return the full path to the PowerPoint file
 
+# Function to clean up temporary files
+def cleanup_files():
+    if os.path.exists(pdf_path):
+        os.remove(pdf_path)
+    if pptx_file_path and os.path.exists(pptx_file_path):
+        os.remove(pptx_file_path)
+
+# Register cleanup on exit
+atexit.register(cleanup_files)
+
 # Route to handle file upload and conversion
 @app.route('/convert', methods=['POST'])
 def convert_pdf_to_ppt():
@@ -96,13 +107,8 @@ def convert_pdf_to_ppt():
         print(f"Error during file processing: {e}")
         return f"Error: {str(e)}", 500
     finally:
-        # Clean up the uploaded PDF file
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
-
-        # Clean up the PowerPoint file if it was created
-        if pptx_file_path and os.path.exists(pptx_file_path):
-            os.remove(pptx_file_path)
+        # Cleanup is deferred to atexit to avoid any issues with file access
+        pass
 
 if __name__ == '__main__':
     app.run(debug=True)
