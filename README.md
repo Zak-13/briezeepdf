@@ -84,34 +84,6 @@ Form Data Parameters
 
     file (required): The PDF file to be converted. This file should be included in the multipart/form-data body of the request.
 
-Example Request
-
-POST http://127.0.0.1:5000/convert
-Content-Type: multipart/form-data
-
---boundary
-Content-Disposition: form-data; name="file"; filename="sample.pdf"
-Content-Type: application/pdf
-
-<PDF file content>
---boundary--
-
-Response
-
-    Status Code: 200 OK (If the conversion is successful)
-    Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation (PPTX file)
-    Body: The converted PowerPoint file (PPTX) containing images of the PDF pages.
-
-Example Response
-
-If the conversion is successful, the server responds with the PPTX file.
-
-HTTP/1.1 200 OK
-Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation
-Content-Disposition: attachment; filename="converted_presentation.pptx"
-
-<PowerPoint file content>
-
 Error Responses
 
     Status Code: 400 Bad Request
