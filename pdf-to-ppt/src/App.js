@@ -135,12 +135,13 @@ function App() {
   };
 
   return (
-    <Container sx={{ paddingTop: 4, paddingBottom: 6, backgroundColor: '#3e3e42' }}>
+    <Container sx={{ paddingTop: 4, paddingBottom: 6 }}>
       <Stack direction="row" spacing={4} >
         <Paper sx={{
           padding: 4,
           borderRadius: 2,
           boxShadow: 3,
+          zIndex: 3,
           textAlign: 'center',
           backgroundColor: '#505050', // Soft grayish background to match pastel goth
           border: `1px solid ${grey[700]}`,
@@ -288,6 +289,7 @@ function App() {
           padding: 4,
           borderRadius: 2,
           boxShadow: 3,
+          zIndex: 3,
           textAlign: 'center',
           backgroundColor: '#505050', // Soft grayish background to match pastel goth
           border: `1px solid ${grey[700]}`,
@@ -322,6 +324,7 @@ function App() {
         <Box sx={{ 
           padding: 4, 
           marginTop: 6, 
+          zIndex: 3,
           borderRadius: 2 , flex: 1, 
           textAlign: 'center',
           backgroundColor: '#505050', // Soft grayish background to match pastel goth

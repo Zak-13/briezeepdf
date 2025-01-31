@@ -24,19 +24,89 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Convert PDF to PPTX</title>
-  </head>
-  <body style="background-color:#3e3e42;"">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+  </div>
+  <!-- Add tsparticles CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@1.39.0/tsparticles.min.js"></script>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  <style>
+      /* Style for the body element to ensure the particles are in the background */
+      body {
+          margin: 0;
+          padding: 0;
+          height: 100vh;
+          overflow: hidden; /* Prevent scrollbars from showing */
+          background-color: #1d1f22; /* Dark background */
+          position: relative;
+      }
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+      /* Style for other content, to make sure it stays on top of particles */
+      .content {
+          position: relative;
+          z-index: 10;
+          color: white;
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding: 50px;
+      }
+  </style>
+</head><div id="root">
+<body>
+
+  <!-- Initialize the particle effect on the body element -->
+  <script>
+      tsParticles.load("body", {
+          fullScreen: {
+              enable: true,  // Make the particles cover the full screen
+              zIndex: 0      // Set z-index to send particles to the background
+          },
+          particles: {
+              number: {
+                  value: 80,  // Number of particles
+                  density: {
+                      enable: true,
+                      value_area: 800 // Area density of particles
+                  }
+              },
+              color: {
+                  value: "#F06292" // Particle color
+              },
+              shape: {
+                  type: "circle", // Particle shape
+              },
+              opacity: {
+                  value: 0.5, // Particle opacity
+                  random: true,
+                  animation: {
+                      enable: true,
+                      speed: 1,
+                      minimumValue: 0.1
+                  }
+              },
+              size: {
+                  value: 3, // Particle size
+                  random: true,
+              },
+              links: {
+                  enable: true,
+                  distance: 150, // Distance to draw lines between particles
+                  color: "#F06292", // Line color
+                  opacity: 0.5, // Line opacity
+                  width: 1 // Line width
+              },
+              move: {
+                  enable: true,
+                  speed: 2, // Speed of particle movement
+                  direction: "none",
+                  random: true,
+                  straight: false,
+                  outMode: "out", // Out mode (particles disappear when out of screen)
+                  attract: {
+                      enable: false,
+                  }
+              }
+          },
+      });
+  </script>
+
+</body>
 </html>
