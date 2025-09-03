@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, CircularProgress, Typography, Box, Container, Input, Alert, Paper, IconButton, Stack } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import {
+  Button, CircularProgress, Typography, Box, Container,
+  Input, Alert, Paper, IconButton, Stack
+} from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PetsIcon from '@mui/icons-material/Pets';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { pink, teal, grey } from '@mui/material/colors';
+import { pink, purple, grey } from '@mui/material/colors';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 
-// Ensure the worker is being loaded correctly from the installed pdfjs-dist package
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+// ✅ Fix pdf.js worker error
+GlobalWorkerOptions.workerSrc =
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
 
 function App() {
   const [file, setFile] = useState(null);
@@ -17,32 +21,32 @@ function App() {
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [error, setError] = useState('');
   const [pdfThumbnail, setPdfThumbnail] = useState(null);
-  const [downloadFileName, setDownloadFileName] = useState('');  // State for the download filename
-  const [history, setHistory] = useState([]);  // History state to store converted files
+  const [downloadFileName, setDownloadFileName] = useState('');
+  const [history, setHistory] = useState([]);
 
   // Handle PDF file change
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === 'application/pdf') {
       setFile(selectedFile);
-      setError(""); // Reset error if file is valid
-      generatePdfThumbnail(selectedFile);  // Generate PDF thumbnail
+      setError('');
+      generatePdfThumbnail(selectedFile);
     } else {
       setFile(null);
-      setError("Please upload a valid PDF file.");
-      setPdfThumbnail(null);  // Clear thumbnail on invalid file
+      setError('Please upload a valid PDF file.');
+      setPdfThumbnail(null);
     }
   };
 
-  // Generate thumbnail of the first page of the PDF
+  // Generate PDF thumbnail
   const generatePdfThumbnail = async (file) => {
     const reader = new FileReader();
     reader.onload = async () => {
       const pdfData = new Uint8Array(reader.result);
       try {
         const pdfDoc = await getDocument(pdfData).promise;
-        const page = await pdfDoc.getPage(1);  // Get the first page
-        const scale = 0.3;  // Scale down the page for a smaller preview
+        const page = await pdfDoc.getPage(1);
+        const scale = 0.3;
         const viewport = page.getViewport({ scale });
 
         const canvas = document.createElement('canvas');
@@ -51,69 +55,56 @@ function App() {
         canvas.width = viewport.width;
 
         await page.render({ canvasContext: context, viewport }).promise;
-
-        // Convert canvas to image and store it
-        const imgDataUrl = canvas.toDataURL();
-        setPdfThumbnail(imgDataUrl);
-      } catch (error) {
-        console.error("Error generating PDF thumbnail:", error);
-        setError("Error generating thumbnail.");
+        setPdfThumbnail(canvas.toDataURL());
+      } catch (err) {
+        console.error('Error generating PDF thumbnail:', err);
+        setError('Error generating thumbnail.');
       }
     };
     reader.readAsArrayBuffer(file);
   };
 
-  // Handle PDF Upload
+  // Upload & convert
   const handleUpload = async () => {
     if (!file) {
-      setError("Please select a PDF file first!");
+      setError('Please select a PDF file first!');
       return;
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
     setLoading(true);
-    setError(""); // Reset error if a new file is uploaded
+    setError('');
 
     try {
       const response = await axios.post('http://localhost:5000/convert', formData, {
-        responseType: 'blob',  // Ensure we handle the file response as a blob
+        responseType: 'blob',
       });
 
-      // Generate a download URL from the response blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      setDownloadUrl(url);  // Set the new download URL based on the unique PPTX file
+      setDownloadUrl(url);
 
-      // Extract the file name from the uploaded PDF
-      const pdfFileName = file.name.split('.').slice(0, -1).join('.');  // Remove file extension
-      const pptFileName = `${pdfFileName}.pptx`;  // Create PPTX filename
+      const pdfFileName = file.name.split('.').slice(0, -1).join('.');
+      const pptFileName = `${pdfFileName}.pptx`;
+      setDownloadFileName(pptFileName);
 
-      setDownloadFileName(pptFileName);  // Set the filename to the same name with .pptx extension
-
-      // Add the converted file to history
-      setHistory(prevHistory => [
-        ...prevHistory,
-        { name: pptFileName, url }
-      ]);
-
-    } catch (error) {
-      console.error("Error during file upload:", error);
-      setError("There was an error uploading the file.");
+      setHistory((prev) => [...prev, { name: pptFileName, url }]);
+    } catch (err) {
+      console.error('Error during file upload:', err);
+      setError('There was an error uploading the file.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle delete action
   const handleDelete = () => {
-    setFile(null);  // Remove the uploaded file
-    setPdfThumbnail(null);  // Clear the thumbnail
-    setError("");  // Reset any error message
-    setDownloadUrl(null);  // Clear any download URL
+    setFile(null);
+    setPdfThumbnail(null);
+    setError('');
+    setDownloadUrl(null);
   };
 
-  // Handle drag events
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -125,40 +116,68 @@ function App() {
     const selectedFile = e.dataTransfer.files[0];
     if (selectedFile && selectedFile.type === 'application/pdf') {
       setFile(selectedFile);
-      setError("");
-      generatePdfThumbnail(selectedFile);  // Generate PDF thumbnail
+      setError('');
+      generatePdfThumbnail(selectedFile);
     } else {
       setFile(null);
-      setError("Please upload a valid PDF file.");
-      setPdfThumbnail(null);  // Clear thumbnail on invalid file
+      setError('Please upload a valid PDF file.');
+      setPdfThumbnail(null);
     }
   };
 
   return (
-    <Container sx={{ paddingTop: 4, paddingBottom: 6 }}>
-      <Stack direction="row" spacing={4} >
-        <Paper sx={{
-          padding: 4,
-          borderRadius: 2,
-          boxShadow: 3,
-          zIndex: 3,
-          textAlign: 'center',
-          backgroundColor: '#505050', // Soft grayish background to match pastel goth
-          border: `1px solid ${grey[700]}`,
-        }}>
-
-          <Typography variant="h4" color={pink[300]} gutterBottom sx={{ fontFamily: 'Creepster, sans-serif', fontWeight: 'bold' }}>
+    <Container
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowY: 'auto',
+        paddingTop: 4,
+        paddingBottom: 6,
+      }}
+    >
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        spacing={4}
+        sx={{ flexGrow: 1 }}
+      >
+        {/* Upload Section */}
+        <Paper
+          sx={{
+            p: 4,
+            borderRadius: 2,
+            boxShadow: 3,
+            zIndex: 3,
+            textAlign: 'center',
+            backgroundColor: '#000000', // black gothic
+            border: `1px solid ${purple[900]}`,
+          }}
+        >
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontFamily: 'Arial, sans-serif',
+              fontWeight: 'bold',
+              color: pink[200],
+            }}
+          >
             PDF to PowerPoint Converter
           </Typography>
 
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap={3}>
-
-            {/* File Upload Area */}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            gap={3}
+          >
+            {/* File Upload */}
             <Box
               sx={{
-                border: `2px dashed ${teal[400]}`,
+                border: `2px dashed ${purple[300]}`,
                 borderRadius: 2,
-                padding: 4,
+                p: 4,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -166,30 +185,38 @@ function App() {
                 maxWidth: 400,
                 cursor: 'pointer',
                 transition: 'all 0.3s ease-in-out',
-                '&:hover': { borderColor: teal[600], backgroundColor: '#383838' },
-                flexDirection: 'column', // Stack content vertically
+                '&:hover': {
+                  borderColor: purple[500],
+                  backgroundColor: '#1A1A1A',
+                },
+                flexDirection: 'column',
               }}
               onClick={() => document.getElementById('file-input').click()}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
-              <IconButton sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <CloudUploadIcon sx={{ fontSize: 40, color: teal[300] }} />
+              <IconButton>
+                <PetsIcon sx={{ fontSize: 40, color: purple[200] }} />
               </IconButton>
-              <Typography variant="body1" color={teal[300]} sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="body1"
+                sx={{ color: purple[200], textAlign: 'center' }}
+              >
                 Click or Drag your PDF here
               </Typography>
 
-              {/* Show file preview if PDF is uploaded */}
               {pdfThumbnail && (
-                <Box sx={{ marginTop: 2, width: '100%', maxWidth: 200 }}>
-                  <img src={pdfThumbnail} alt="PDF Thumbnail" style={{ width: '100%', borderRadius: 8 }} />
+                <Box sx={{ mt: 2, width: '100%', maxWidth: 200 }}>
+                  <img
+                    src={pdfThumbnail}
+                    alt="PDF Thumbnail"
+                    style={{ width: '100%', borderRadius: 8 }}
+                  />
                 </Box>
               )}
 
-              {/* Show file name if PDF is uploaded */}
               {file && !pdfThumbnail && (
-                <Typography variant="body2" color="textSecondary" sx={{ marginTop: 2 }}>
+                <Typography variant="body2" sx={{ color: grey[300], mt: 2 }}>
                   {file.name}
                 </Typography>
               )}
@@ -203,16 +230,15 @@ function App() {
               sx={{ display: 'none' }}
             />
 
-            {/* Upload Button */}
+            {/* Convert Button */}
             <Button
               variant="contained"
-              color="primary"
               onClick={handleUpload}
               disabled={loading || !file}
               sx={{
                 width: '100%',
                 maxWidth: 400,
-                padding: 2,
+                p: 2,
                 borderRadius: 1,
                 fontWeight: 'bold',
                 fontSize: '16px',
@@ -221,52 +247,51 @@ function App() {
                 boxShadow: `0 4px 12px ${pink[300]}`,
               }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : "Convert to PowerPoint"}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Convert to PowerPoint'
+              )}
             </Button>
 
-            {/* Error Alert */}
             {error && (
               <Alert severity="error" sx={{ width: '100%', maxWidth: 400 }}>
                 {error}
               </Alert>
             )}
 
-            {/* Download Button */}
             {downloadUrl && (
               <Box>
                 <a href={downloadUrl} download={downloadFileName}>
                   <Button
                     variant="contained"
-                    color="success"
                     sx={{
                       width: '100%',
                       maxWidth: 400,
-                      padding: 2,
+                      p: 2,
                       borderRadius: 1,
                       fontWeight: 'bold',
                       fontSize: '16px',
-                      backgroundColor: teal[500],
-                      '&:hover': { backgroundColor: teal[700] },
+                      backgroundColor: purple[400],
+                      '&:hover': { backgroundColor: purple[600] },
                     }}
                   >
-                    <FileDownloadIcon sx={{ marginRight: 1 }} />
+                    <FileDownloadIcon sx={{ mr: 1 }} />
                     Download PowerPoint
                   </Button>
                 </a>
               </Box>
             )}
 
-            {/* Delete Button */}
             {file && (
-              <Box sx={{ marginTop: 2 }}>
+              <Box sx={{ mt: 2 }}>
                 <Button
                   variant="outlined"
-                  color="error"
                   onClick={handleDelete}
                   sx={{
                     width: '100%',
                     maxWidth: 400,
-                    padding: 2,
+                    p: 2,
                     borderRadius: 1,
                     fontWeight: 'bold',
                     fontSize: '16px',
@@ -275,7 +300,7 @@ function App() {
                     '&:hover': { borderColor: pink[600], color: pink[600] },
                   }}
                 >
-                  <DeleteIcon sx={{ marginRight: 1 }} />
+                  <DeleteIcon sx={{ mr: 1 }} />
                   Delete PDF
                 </Button>
               </Box>
@@ -283,92 +308,134 @@ function App() {
           </Box>
         </Paper>
 
-        {/* How to Convert Section */}
-        <Stack>
-        <Box sx={{
-          padding: 4,
-          borderRadius: 2,
-          boxShadow: 3,
-          zIndex: 3,
-          textAlign: 'center',
-          backgroundColor: '#505050', // Soft grayish background to match pastel goth
-          border: `1px solid ${grey[700]}`,
-        }}>
-          
-          <Typography variant="h5" color={pink[300]} gutterBottom>
-            How to Convert Files
-          </Typography>
-          <Box display="flex" flexDirection="column" alignItems="center" gap={4}>
-            <Box display="flex" alignItems="center" gap={2}>
-              <CloudUploadIcon sx={{ fontSize: 40, color: teal[300] }} />
-              <Typography variant="body1" color={grey[300]}>
-                1. Upload your PDF file by clicking or dragging it here.
-              </Typography>
-            </Box>
-            <Box display="flex" alignItems="center" gap={2}>
-              <CircularProgress sx={{ color: teal[300] }} size={40} />
-              <Typography variant="body1" color={grey[300]}>
-                2. Wait as the file is processed and converted to PowerPoint.
-              </Typography>
-            </Box>
-            <Box display="flex" alignItems="center" gap={2}>
-              <CheckCircleIcon sx={{ fontSize: 40, color: teal[300] }} />
-              <Typography variant="body1" color={grey[300]}>
-                3. Download your PowerPoint file once the conversion is complete.
-              </Typography>
+        {/* Instructions + History */}
+        <Stack sx={{ flex: 1 }}>
+          {/* How to Convert */}
+          <Box
+            sx={{
+              p: 4,
+              borderRadius: 2,
+              boxShadow: 3,
+              textAlign: 'center',
+              backgroundColor: '#000000',
+              border: `1px solid ${purple[900]}`,
+            }}
+          >
+            <Typography
+              variant="h5"
+              gutterBottom
+              sx={{ color: pink[200], fontFamily: 'Arial, sans-serif' }}
+            >
+              How to Convert Files
+            </Typography>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={4}
+            >
+              <Box display="flex" alignItems="center" gap={2}>
+                <PetsIcon sx={{ fontSize: 40, color: purple[200] }} />
+                <Typography sx={{ color: grey[300] }}>
+                  1. Upload your PDF file by clicking or dragging it here.
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" gap={2}>
+                <CircularProgress sx={{ color: purple[200] }} size={40} />
+                <Typography sx={{ color: grey[300] }}>
+                  2. Wait as the file is processed and converted to PowerPoint.
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" gap={2}>
+                <CheckCircleIcon sx={{ fontSize: 40, color: purple[200] }} />
+                <Typography sx={{ color: grey[300] }}>
+                  3. Download your PowerPoint file once the conversion is
+                  complete.
+                </Typography>
+              </Box>
             </Box>
           </Box>
-        </Box>
 
-        {/* History Section */}
-        <Box sx={{ 
-          padding: 4, 
-          marginTop: 6, 
-          zIndex: 3,
-          borderRadius: 2 , flex: 1, 
-          textAlign: 'center',
-          backgroundColor: '#505050', // Soft grayish background to match pastel goth
-          border: `1px solid ${grey[700]}`,
-          boxShadow: 3,
-          }}>
-          <Typography variant="h5" color={pink[300]} gutterBottom>
-            Conversion History
-          </Typography>
-          <Box>
-            {history.length === 0 ? (
-              <Typography variant="body1" color={grey[300]}>
-                No conversion history found.
-              </Typography>
-            ) : (
-              history.map((item, index) => (
-                <Box key={index} sx={{ marginBottom: 2 }}>
+          {/* Conversion History */}
+          <Box
+            sx={{
+              p: 4,
+              mt: 6,
+              borderRadius: 2,
+              backgroundColor: '#000000',
+              border: `1px solid ${purple[900]}`,
+              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.3)',
+              maxHeight: 400,
+              overflowY: 'auto',
+              flex: 1,
+            }}
+          >
+            <Typography
+              sx={{
+                color: pink[200],
+                mb: 2,
+                textAlign: 'center',
+                fontFamily: 'Arial, sans-serif',
+              }}
+            >
+              Conversion History
+            </Typography>
+            <Stack spacing={1}>
+              {history.length === 0 ? (
+                <Typography
+                  sx={{ color: grey[300], textAlign: 'center' }}
+                >
+                  No conversion history found.
+                </Typography>
+              ) : (
+                <>
+                  {history.map((item, index) => (
+                    <Button
+                      key={index}
+                      variant="outlined"
+                      href={item.url}
+                      download={item.name}
+                      sx={{
+                        width: '100%',
+                        color: grey[100],
+                        borderColor: purple[300],
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          borderColor: purple[500],
+                          color: purple[500],
+                          boxShadow: '0 0 12px #BA68C8',
+                        },
+                      }}
+                    >
+                      <FileDownloadIcon sx={{ mr: 1, color: purple[300] }} />
+                      {item.name}
+                    </Button>
+                  ))}
                   <Button
-                    variant="outlined"
-                    color="primary"
-                    href={item.url}
-                    download={item.name}
+                    onClick={() => setHistory([])}
                     sx={{
+                      mt: 2,
                       width: '100%',
-                      maxWidth: 400,
-                      padding: 2,
-                      borderRadius: 1,
-                      fontWeight: 'bold',
-                      fontSize: '16px',
-                      borderColor: teal[500],
-                      color: teal[500],
-                      '&:hover': { borderColor: teal[700], color: teal[700] },
+                      borderColor: pink[300],
+                      color: pink[300],
+                      '&:hover': {
+                        borderColor: pink[600],
+                        color: pink[600],
+                        boxShadow: '0 0 12px #F48FB1',
+                      },
                     }}
                   >
-                    <FileDownloadIcon sx={{ marginRight: 1 }} />
-                    {item.name}
+                    <DeleteIcon sx={{ mr: 1 }} /> Clear History
                   </Button>
-                </Box>
-              ))
-            )}
+                </>
+              )}
+            </Stack>
           </Box>
-        </Box>
         </Stack>
-      </Stack>  
+      </Stack>
     </Container>
   );
 }
