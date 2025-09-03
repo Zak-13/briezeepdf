@@ -5,108 +5,42 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+    <meta name="description" content="Convert PDFs to PowerPoint easily" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
     <title>Convert PDF to PPTX</title>
-  </div>
-  <!-- Add tsparticles CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@1.39.0/tsparticles.min.js"></script>
 
-  <style>
-      /* Style for the body element to ensure the particles are in the background */
+    <style>
+      /* Reset and base */
       body {
-          margin: 0;
-          padding: 0;
-          height: 100vh;
-          overflow: hidden; /* Prevent scrollbars from showing */
-          background-color: #1d1f22; /* Dark background */
-          position: relative;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: radial-gradient(
+            circle at top left,
+            rgba(186, 104, 200, 0.25),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(244, 143, 177, 0.2),
+            transparent 60%
+          ),
+          #121212; /* base dark */
+        background-attachment: fixed; /* keeps gradient stable */
+        background-size: cover;
+        font-family: "Poppins", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
-      /* Style for other content, to make sure it stays on top of particles */
-      .content {
-          position: relative;
-          z-index: 10;
-          color: white;
-          font-family: Arial, sans-serif;
-          text-align: center;
-          padding: 50px;
+      /* Keep React content above */
+      #root {
+        position: relative;
+        z-index: 1;
       }
-  </style>
-</head><div id="root">
-<body>
-
-  <!-- Initialize the particle effect on the body element -->
-  <script>
-      tsParticles.load("body", {
-          fullScreen: {
-              enable: true,  // Make the particles cover the full screen
-              zIndex: 0      // Set z-index to send particles to the background
-          },
-          particles: {
-              number: {
-                  value: 80,  // Number of particles
-                  density: {
-                      enable: true,
-                      value_area: 800 // Area density of particles
-                  }
-              },
-              color: {
-                  value: "#F06292" // Particle color
-              },
-              shape: {
-                  type: "circle", // Particle shape
-              },
-              opacity: {
-                  value: 0.5, // Particle opacity
-                  random: true,
-                  animation: {
-                      enable: true,
-                      speed: 1,
-                      minimumValue: 0.1
-                  }
-              },
-              size: {
-                  value: 3, // Particle size
-                  random: true,
-              },
-              links: {
-                  enable: true,
-                  distance: 150, // Distance to draw lines between particles
-                  color: "#F06292", // Line color
-                  opacity: 0.5, // Line opacity
-                  width: 1 // Line width
-              },
-              move: {
-                  enable: true,
-                  speed: 2, // Speed of particle movement
-                  direction: "none",
-                  random: true,
-                  straight: false,
-                  outMode: "out", // Out mode (particles disappear when out of screen)
-                  attract: {
-                      enable: false,
-                  }
-              }
-          },
-      });
-  </script>
-
-</body>
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
