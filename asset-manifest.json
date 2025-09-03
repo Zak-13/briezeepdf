@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/briezeepdf/static/css/main.e6c13ad2.css",
+    "main.js": "/briezeepdf/static/js/main.a2a10af7.js",
+    "static/js/488.66afb419.chunk.js": "/briezeepdf/static/js/488.66afb419.chunk.js",
+    "index.html": "/briezeepdf/index.html",
+    "main.e6c13ad2.css.map": "/briezeepdf/static/css/main.e6c13ad2.css.map",
+    "main.a2a10af7.js.map": "/briezeepdf/static/js/main.a2a10af7.js.map",
+    "488.66afb419.chunk.js.map": "/briezeepdf/static/js/488.66afb419.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.a2a10af7.js"
+  ]
+}
